@@ -1,0 +1,179 @@
+#include <iostream>
+#include <vector>
+#include <unistd.h>
+using namespace std;
+
+class Object
+{
+public:
+    Object(double x, const double v0, const double a, const int dev, string name):
+    _x(x), _v(v0), _a(a), _dev(dev), win(0), _name(name)
+    {}
+    
+    ~Object(){}
+    
+    int delta()
+    {
+        int delta = rand() % 2 * _dev - _dev;
+        return delta;
+    }
+    
+    void Uniformly_accelerated_movement()
+    {
+        _v += _a + delta();
+        _x += _v;
+       
+    }
+    
+    void Equidistant_movement()
+    {
+        _v -= _a - delta();
+        _x += _v;
+       
+    }
+    
+    void Uniform_movement()
+    {
+        _v = _v + delta();
+        _x += _v;
+        
+    }
+    
+    void print()
+    {
+        cout << _name << "  x: " << _x << "   v: " << _v << endl;
+    }
+    
+   virtual void Movement()
+    {
+        
+    }
+    
+public:
+    double _x;
+    double _v;
+    double _a;
+    int _dev;
+    int win;
+    string _name;
+    
+};
+
+
+class Car : public Object
+{
+public:
+    Car (double x, const double v0, const double a, const double dev, string name):
+         Object(x, v0, a, dev, name)
+    {}
+    
+    ~Car(){}
+    
+    void Movement ()
+    {
+        if (_v < 20)
+        {Uniformly_accelerated_movement();}
+        Uniform_movement();
+        Equidistant_movement();
+    }
+};
+
+
+class Cheetah : public Object
+{
+public:
+    Cheetah (double x, const double v0, const double a, const double dev, string name):
+             Object(x, v0, a, dev, name)
+    {}
+    
+    ~Cheetah(){}
+    
+    void Movement ()
+    {
+        if (_v < 30)
+        {Uniformly_accelerated_movement();}
+        Equidistant_movement();
+    }
+};
+
+
+class Turtle : public Object
+{
+public:
+    Turtle (double x, const double v0, const double a, const double dev, string name):
+    Object(x, v0, a, dev, name)
+    {}
+    
+    ~Turtle(){}
+    
+    void Movement ()
+    {
+        Uniform_movement();
+    }
+};
+
+class Engine
+{
+public:
+    vector<Object*> A;
+    int distance = 1000;
+    
+
+    void append (Object* t)
+    {
+        A.push_back(t);
+    }
+    
+    
+    void Output()
+    {
+        for (;;){
+        
+        for (int i = 0; i < A.size(); i++)
+      {
+          if (A[i] -> _x < distance)
+          {
+              A[i] -> Movement();
+              A[i] -> print();
+              
+          }
+          else
+          {
+              A[i] -> win = 1;
+              cout << A[i] -> _name << "   wins" << endl;
+              return;
+          }
+      }
+            usleep(1000000);
+            for (int i = 0; i < 20; i++)
+            {cout << endl;}
+    }
+        
+    }
+    
+};
+
+
+
+int main()
+{
+    cout << "Hello! It is a great race. Distant: 1000m\nToday we will know, who is the fastest: car, cheetah or turtle" << endl;
+    
+    Car* g = new Car;
+    Turtle* t = new Turtle;
+    Cheetah* c = new Cheetah;
+    
+    g(0, 0, 5, 0.5, "Garry");
+    t(0, 0.1, 0, 0.5, "Freya");
+    c(0, 3, 1, 0.5, "Bart");
+    Engine simulator;
+    
+    
+    simulator.append(&g);
+    simulator.append(&t);
+    simulator.append(&c);
+    
+   simulator.Output();
+    
+    return 0;
+}
